@@ -10,7 +10,11 @@ import lib.malobjclass
 
 #user defined actions here
 def user_land(pdf):
-	print pdf.file_md5
+	if type(pdf) is not list:
+		print pdf.file_md5
+	else:
+		for p in pdf:
+			print p.file_md5	
 
 def main():
 	oParser = optparse.OptionParser(usage='usage: %prog [options]\n' + __description__, version='%prog ' + __version__)
@@ -21,9 +25,10 @@ def main():
 	
 	if options.file:
 		output = build_obj(options.file)
-		pdf = malobjclass.jPdf(json.loads(output))
+		pdf = lib.malobjclass.jPdf(json.loads(output))
 		user_land(pdf)
-		pdf.make_report(pdf,options.report)
+		if options.report:
+			pdf.make_report(pdf,options.report)
 	elif options.dir:
 		files = []
 		pdfs = []
@@ -34,11 +39,13 @@ def main():
 		for file in files:
 			print "[+] Analyzing file " + file
 			output = build_obj(options.dir + file)
-			pdf = malobjclass.jPdf(json.loads(output))
+			pdf = lib.malobjclass.jPdf(json.loads(output))
 			pdfs.append(pdf)
 		
 		user_land(pdfs)
-		pdf.make_report(pdfs,options.report)
+		if options.report:
+			for p in pdfs:
+				p.make_report(p,options.report)
 	else:
 		oParser.print_help()	
 		return
